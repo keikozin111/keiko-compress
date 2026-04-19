@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keiko Compress — Video compression, simplified</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff5b3a'/%3E%3Cpath d='M20 22 L32 32 L20 42 M44 22 L32 32 L44 42' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="nav">
+    <a href="/" class="logo" aria-label="Keiko Compress">
+      <svg class="logo-mark" viewBox="0 0 64 64" width="36" height="36" aria-hidden="true">
+        <rect class="logo-bg" width="64" height="64" rx="14" />
+        <path class="logo-arrow logo-arrow-left" d="M18 22 L30 32 L18 42" />
+        <path class="logo-arrow logo-arrow-right" d="M46 22 L34 32 L46 42" />
+      </svg>
+      <span class="logo-text">Keiko<span class="logo-accent">Compress</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="https://ffmpeg.org" target="_blank" rel="noopener">Powered by FFmpeg</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero reveal">
+      <h1>Comprima vídeos, sem perder o que importa.</h1>
+      <p class="subtitle">Escolha o codec, o método e o tamanho final. A gente cuida do resto.</p>
+    </section>
+
+    <section id="upload-section" class="panel reveal">
+      <div id="dropzone" class="dropzone">
+        <input type="file" id="file-input" accept="video/*" hidden />
+        <div class="dropzone-inner">
+          <svg class="dropzone-icon" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+            <path d="M24 32 V12 M16 20 L24 12 L32 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M8 32 V38 A2 2 0 0 0 10 40 H38 A2 2 0 0 0 40 38 V32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <p class="dropzone-title">Arraste seu vídeo aqui</p>
+          <p class="dropzone-sub">ou <button type="button" id="browse-btn" class="link-btn">procure no computador</button></p>
+          <p class="dropzone-hint">MP4, MOV, MKV, WEBM, AVI — até 5 GB</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings-section" class="panel hidden">
+      <div class="file-info">
+        <div class="file-info-main">
+          <div class="file-name" id="file-name">video.mp4</div>
+          <div class="file-meta" id="file-meta">—</div>
+        </div>
+        <button id="remove-btn" class="ghost-btn" title="Remover">×</button>
+      </div>
+
+      <video id="preview" class="preview" controls playsinline></video>
+
+      <div class="settings-grid">
+        <div class="field">
+          <label for="codec">Video codec</label>
+          <select id="codec">
+            <option value="h264" selected>H.264 — máxima compatibilidade</option>
+            <option value="h265">H.265 / HEVC — melhor compressão</option>
+            <option value="vp9">VP9 — ideal para web</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="method">Método de compressão</label>
+          <select id="method">
+            <option value="size">Tamanho final (MB)</option>
+            <option value="percentage">Porcentagem do original (%)</option>
+            <option value="quality" selected>Qualidade (CRF)</option>
+            <option value="bitrate">Bitrate (kbps)</option>
+          </select>
+        </div>
+
+        <div class="field field-full">
+          <label for="value" id="value-label">Qualidade (CRF)</label>
+          <div class="value-row">
+            <input type="range" id="value-slider" min="18" max="35" value="23" step="1" />
+            <input type="number" id="value-input" value="23" />
+            <span class="value-unit" id="value-unit">CRF</span>
+          </div>
+          <p class="field-hint" id="value-hint">Menor = melhor qualidade. 18-23 recomendado.</p>
+        </div>
+
+        <div class="field">
+          <label for="resolution">Resolução</label>
+          <select id="resolution">
+            <option value="original" selected>Manter original</option>
+            <option value="1080p">1080p</option>
+            <option value="720p">720p</option>
+            <option value="480p">480p</option>
+            <option value="360p">360p</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="audio">Áudio</label>
+          <select id="audio">
+            <option value="keep" selected>Manter original</option>
+            <option value="192k">Alta (192 kbps)</option>
+            <option value="128k">Média (128 kbps)</option>
+            <option value="64k">Baixa (64 kbps)</option>
+            <option value="remove">Remover áudio</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="preset">Velocidade de encode</label>
+          <select id="preset">
+            <option value="ultrafast">Ultra rápido</option>
+            <option value="fast">Rápido</option>
+            <option value="medium" selected>Médio (equilibrado)</option>
+            <option value="slow">Lento (melhor qualidade)</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="compress-btn" class="primary-btn">
+        <span>Comprimir vídeo</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M5 12 L19 12 M13 6 L19 12 L13 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </button>
+    </section>
+
+    <section id="progress-section" class="panel hidden">
+      <div class="progress-header">
+        <div class="spinner"></div>
+        <div>
+          <div class="progress-title">Comprimindo seu vídeo…</div>
+          <div class="progress-sub" id="progress-sub">Isso pode levar alguns minutos.</div>
+        </div>
+      </div>
+      <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+      <div class="progress-pct" id="progress-pct">0%</div>
+    </section>
+
+    <section id="result-section" class="panel hidden">
+      <div class="result-header">
+        <svg class="result-check" viewBox="0 0 24 24" width="32" height="32" aria-hidden="true">
+          <circle cx="12" cy="12" r="11" fill="#22c55e"/>
+          <path d="M7 12 L11 16 L17 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <div>
+          <div class="result-title">Pronto!</div>
+          <div class="result-sub" id="result-sub">Seu vídeo comprimido está pronto para download.</div>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="compare-box">
+          <div class="compare-label">Original</div>
+          <div class="compare-size" id="original-size">—</div>
+        </div>
+        <div class="compare-arrow">→</div>
+        <div class="compare-box compare-highlight">
+          <div class="compare-label">Comprimido</div>
+          <div class="compare-size" id="output-size">—</div>
+          <div class="compare-savings" id="savings">—</div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <a id="download-link" class="primary-btn" download>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M12 4 V16 M6 10 L12 16 L18 10 M5 20 H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span>Baixar vídeo</span>
+        </a>
+        <button id="restart-btn" class="secondary-btn">Comprimir outro</button>
+      </div>
+    </section>
+
+    <section id="how" class="how reveal">
+      <h2>Como funciona</h2>
+      <div class="how-grid">
+        <div class="how-step">
+          <div class="how-num">01</div>
+          <div class="how-title">Envie</div>
+          <p>Arraste seu vídeo — nada sai do nosso servidor de compressão.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num">02</div>
+          <div class="how-title">Configure</div>
+          <p>Escolha codec, método e o tamanho final desejado.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num">03</div>
+          <div class="how-title">Baixe</div>
+          <p>Receba o arquivo comprimido, otimizado e pronto pra usar.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Keiko Compress © 2026</span>
+    <span class="footer-sep">·</span>
+    <span>Feito com FFmpeg</span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
